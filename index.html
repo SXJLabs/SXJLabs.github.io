@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f4bd6">
+<title>Study Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbfcff; --line:#dbe4f5; --ink:#18264a; --soft:#5b6a8c; --card:#ffffff;
+  --margin:#e5484d; --hi:#ffd93b; --ok:#1f9d63; --okbg:#e3f6ec; --bad:#d6403f; --badbg:#fdeaea;
+  --brand:#2f4bd6; --brandbg:#e8ecff; --shadow:0 1px 0 rgba(24,38,74,.06), 0 6px 18px rgba(24,38,74,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#0f1630; --line:#1f2a52; --ink:#eaf0ff; --soft:#9aa8cc; --card:#16204a;
+    --okbg:#12392b; --badbg:#44181b; --brandbg:#1d2a63; --brand:#8fa4ff; --shadow:0 6px 18px rgba(0,0,0,.35);}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background-color:var(--paper);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px); background-size:100% 32px;
+  min-height:100vh; line-height:1.5;
+}
+h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif; margin:0; letter-spacing:-.01em}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brand); outline-offset:2px}
+.wrap{max-width:980px; margin:0 auto; padding:20px 16px 60px 28px; position:relative}
+.wrap::before{content:""; position:absolute; left:10px; top:0; bottom:0; width:2px; background:var(--margin); opacity:.55}
+header{display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; margin-bottom:18px}
+header h1{font-size:2rem; font-weight:800}
+.rank{display:flex; align-items:center; gap:14px; background:var(--card); border-radius:14px; padding:10px 16px; box-shadow:var(--shadow); min-width:260px}
+.rank .badge{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:1.15rem; background:var(--hi); color:#18264a; padding:4px 12px; border-radius:8px; transform:rotate(-2deg)}
+.rank .xpbox{flex:1}
+.rank small{color:var(--soft)}
+.bar{height:8px; background:var(--line); border-radius:99px; overflow:hidden; margin-top:4px}
+.bar i{display:block; height:100%; background:var(--brand); border-radius:99px; transition:width .4s}
+nav{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap}
+nav button{border:2px solid transparent; background:var(--card); padding:8px 16px; border-radius:10px; font-weight:700; box-shadow:var(--shadow)}
+nav button[aria-selected="true"]{background:var(--ink); color:var(--paper)}
+.card{background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--shadow); margin-bottom:16px}
+.card h2{font-size:1.2rem; margin-bottom:10px}
+.row{display:flex; flex-wrap:wrap; gap:10px; align-items:end}
+label{display:flex; flex-direction:column; font-size:.85rem; color:var(--soft); gap:4px; font-weight:500}
+input,select,textarea{border:1.5px solid var(--line); background:var(--paper); border-radius:8px; padding:8px 10px}
+.btn{border:0; background:var(--brand); color:#fff; padding:9px 16px; border-radius:9px; font-weight:700}
+.btn.ghost{background:var(--brandbg); color:var(--brand)}
+.btn.warn{background:var(--badbg); color:var(--bad)}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.seg{display:inline-flex; background:var(--brandbg); border-radius:9px; padding:3px}
+.seg button{border:0; background:transparent; padding:6px 14px; border-radius:7px; font-weight:700; color:var(--brand)}
+.seg button[aria-pressed="true"]{background:var(--brand); color:#fff}
+.period{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px}
+.period .label{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:1.05rem}
+.task{display:flex; gap:12px; align-items:center; padding:10px 0; border-top:1.5px dashed var(--line)}
+.task:first-of-type{border-top:0}
+.task .info{flex:1; min-width:0}
+.task .t{font-weight:700; overflow-wrap:anywhere}
+.task .m{font-size:.85rem; color:var(--soft)}
+.tag{display:inline-block; font-size:.75rem; font-weight:700; padding:1px 8px; border-radius:6px; background:var(--brandbg); color:var(--brand); margin-right:6px}
+.mark{display:flex; gap:6px}
+.mark button{width:42px; height:42px; border-radius:10px; border:2px solid var(--line); background:var(--paper); font-size:1.25rem; font-weight:800; line-height:1}
+.mark .y[aria-pressed="true"]{background:var(--ok); border-color:var(--ok); color:#fff}
+.mark .n[aria-pressed="true"]{background:var(--bad); border-color:var(--bad); color:#fff}
+.mark button:disabled{cursor:default; opacity:.7}
+.final{font-weight:700; padding:4px 10px; border-radius:8px; font-size:.9rem}
+.final.ok{background:var(--okbg); color:var(--ok)} .final.bad{background:var(--badbg); color:var(--bad)}
+.xo{font-size:.8rem; color:var(--soft)}
+.empty{color:var(--soft); padding:18px 0; text-align:center}
+.submitbar{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-top:12px; padding-top:12px; border-top:2px solid var(--line)}
+.del{border:0; background:transparent; color:var(--soft); font-size:1.1rem; padding:6px}
+.ranks{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px}
+.ranks div{border:1.5px solid var(--line); border-radius:10px; padding:8px 10px}
+.ranks div.cur{border-color:var(--brand); background:var(--brandbg)}
+.ranks b{display:block; font-family:"Bricolage Grotesque",sans-serif}
+.ranks span{font-size:.85rem; color:var(--soft)}
+/* routine */
+.grid{display:grid; width:100%}
+.cell{border:2px solid var(--ink); border-radius:10px; min-height:0; padding:6px; resize:none; text-align:center; font-weight:700; overflow:hidden;
+  display:flex; align-items:center; justify-content:center; background:#fff; color:#18264a}
+.cell.sel{outline:3px solid var(--brand); outline-offset:1px}
+.swatches{display:flex; gap:6px; flex-wrap:wrap}
+.sw{width:28px; height:28px; border-radius:50%; border:2px solid var(--ink); padding:0}
+input[type=range]{padding:0}
+.toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:12px 18px; border-radius:12px; font-weight:700; box-shadow:var(--shadow); z-index:9}
+.owner{background:var(--hi); color:#18264a}
+.owner table{border-collapse:collapse; margin-top:8px}
+.owner td{padding:2px 14px 2px 0}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff} header,nav,.noprint{display:none!important} .wrap::before{display:none}
+  .card{box-shadow:none}
+}
+html{-webkit-text-size-adjust:100%}
+button,.sw{touch-action:manipulation; -webkit-tap-highlight-color:transparent}
+.scrollx{overflow-x:auto; -webkit-overflow-scrolling:touch}
+
+/* ===== Phone layout ===== */
+@media (max-width:700px){
+  input,select,textarea{font-size:16px} /* stops iPhone zooming into fields */
+  .wrap{padding:14px 12px calc(92px + env(safe-area-inset-bottom)) 20px}
+  .wrap::before{left:7px}
+  header{margin-bottom:12px; gap:10px}
+  header h1{font-size:1.5rem}
+  .rank{width:100%; min-width:0; padding:10px 12px}
+  .card{padding:14px 12px; margin-bottom:12px}
+
+  /* tabs become a bottom bar, easy to reach with a thumb */
+  nav{position:fixed; left:0; right:0; bottom:0; z-index:20; margin:0; gap:4px; background:var(--card);
+      border-top:2px solid var(--line); padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+      box-shadow:0 -6px 18px rgba(24,38,74,.1)}
+  nav button{flex:1; box-shadow:none; background:transparent; padding:12px 4px; font-size:.95rem}
+
+  /* add-task form */
+  .formrow>*{flex:1 1 100%}
+  .formrow label:nth-child(2), .formrow label:nth-child(3){flex:1 1 40%}
+  .formrow .btn{padding:13px 16px}
+
+  /* day / week / month */
+  .seg{display:flex; width:100%}
+  .seg button{flex:1; padding:10px 6px}
+  .period .row{width:100%; flex-wrap:nowrap; justify-content:space-between; align-items:center}
+  .period .label{flex:1; text-align:center; font-size:.95rem; line-height:1.25}
+  .period .btn{min-width:44px; min-height:44px; padding:6px 12px}
+  #todayBtn{display:none}
+
+  /* tasks: name on top, big ✓ ✕ buttons under it */
+  .task{flex-wrap:wrap; gap:8px 10px; padding:12px 0}
+  .task .info{flex:1 1 100%}
+  .mark{flex:1}
+  .mark button{flex:1; height:48px; font-size:1.4rem}
+  .del{width:48px; height:48px; font-size:1.2rem}
+  .final{margin-left:auto}
+
+  .submitbar{flex-direction:column; align-items:stretch; position:sticky;
+      bottom:calc(66px + env(safe-area-inset-bottom)); background:var(--card); z-index:5}
+  .submitbar .btn{width:100%; padding:14px}
+  .submitbar .xo{text-align:center}
+
+  /* routine controls */
+  #tab-routine .row>label{flex:1 1 45%}
+  #tab-routine .row>label:nth-child(n+3){flex:1 1 100%}
+  #tab-routine .row>label:has(.swatches){flex:1 1 100%}
+  #tab-routine input[type=number]{width:100%!important}
+  #tab-routine input[type=range]{width:100%; height:28px}
+  #tab-routine .row>.btn{flex:1 1 30%; padding:11px 8px}
+  .sw{width:38px; height:38px}
+  .cell{font-size:.85rem; padding:4px; border-radius:8px; line-height:1.2}
+
+  .ranks{grid-template-columns:repeat(2,1fr)}
+  .toast{bottom:calc(82px + env(safe-area-inset-bottom)); width:calc(100% - 28px); text-align:center}
+}
+@media (max-width:360px){ header h1{font-size:1.3rem} .rank .badge{font-size:1rem} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Study Planner</h1>
+    <div class="rank" id="rankBox">
+      <span class="badge" id="rankName">Beginner</span>
+      <div class="xpbox"><b id="xpText">0 XP</b> <small id="nextText"></small><div class="bar"><i id="xpBar" style="width:0"></i></div></div>
+    </div>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="planner">Planner</button>
+    <button role="tab" aria-selected="false" data-tab="routine">Class routine</button>
+    <button role="tab" aria-selected="false" data-tab="titles">Titles</button>
+  </nav>
+
+  <!-- PLANNER -->
+  <section id="tab-planner">
+    <div class="card">
+      <h2>Add a task</h2>
+      <div class="row formrow">
+        <label class="fname" style="flex:1;min-width:160px">Task name
+          <input id="tTitle" maxlength="80" placeholder="e.g. Physics chapter 3">
+        </label>
+        <label>Type
+          <select id="tType">
+            <option>CT</option><option>MT</option><option>Mid term</option><option>Final</option>
+            <option>Assignment</option><option>Homework</option><option>Other</option>
+          </select>
+        </label>
+        <label>Date <input type="date" id="tDate"></label>
+        <button class="btn" id="addBtn">Add task</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="period">
+        <div class="seg" role="group" aria-label="Page">
+          <button data-mode="day" aria-pressed="true">Day</button>
+          <button data-mode="week" aria-pressed="false">Week</button>
+          <button data-mode="month" aria-pressed="false">Month</button>
+        </div>
+        <div class="row" style="align-items:center">
+          <button class="btn ghost" id="prev" aria-label="Previous">‹</button>
+          <span class="label" id="periodLabel"></span>
+          <button class="btn ghost" id="next" aria-label="Next">›</button>
+          <button class="btn ghost" id="todayBtn">Today</button>
+        </div>
+      </div>
+      <div id="list"></div>
+      <div class="submitbar">
+        <span id="submitInfo" class="xo"></span>
+        <button class="btn" id="submitBtn">Submit this page</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROUTINE -->
+  <section id="tab-routine" hidden>
+    <div class="card noprint">
+      <h2>Build your routine</h2>
+      <div class="row">
+        <label>Columns <input type="number" id="rCols" min="1" max="10" style="width:80px"></label>
+        <label>Rows <input type="number" id="rRows" min="1" max="12" style="width:80px"></label>
+        <label>Margin between boxes: <span id="gapVal"></span>px <input type="range" id="rGap" min="0" max="30"></label>
+        <label>Box height: <span id="hVal"></span>px <input type="range" id="rH" min="50" max="160"></label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label>Colour of selected box
+          <div class="swatches" id="swatches"></div>
+        </label>
+        <button class="btn ghost" id="clearCell">Clear box</button>
+        <button class="btn ghost" id="printBtn">Print routine</button>
+        <button class="btn warn" id="resetRoutine">Reset all</button>
+      </div>
+      <p class="xo" style="margin:10px 0 0">Click a box and type, for example Eng, Ban, Math or Tiffin break. Everything saves automatically.</p>
+    </div>
+    <div class="card scrollx"><div class="grid" id="grid"></div></div>
+  </section>
+
+  <!-- TITLES -->
+  <section id="tab-titles" hidden>
+    <div class="card">
+      <h2>Titles you can earn</h2>
+      <div class="ranks" id="ranksList"></div>
+    </div>
+    <div class="card">
+      <h2>Your record</h2>
+      <p id="record" style="margin:0"></p>
+    </div>
+  </section>
+
+  <div class="card owner" id="ownerBox" hidden>
+    <h2>Visits</h2>
+    <div id="ownerData">Loading…</div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ============ SETTINGS ============ */
+const XP_PER_TASK = 100;
+const RANKS = [
+  {name:'Beginner', xp:0}, {name:'Amateur', xp:500}, {name:'Learner', xp:1500},
+  {name:'Skilled', xp:3000}, {name:'Expert', xp:5000}, {name:'Master', xp:8000}, {name:'Legend', xp:12000}
+];
+/* Visit counter: change this to something unique to you so nobody else shares your count */
+const COUNTER_NS = 'mhs-study-planner-change-me';
+const SWATCHES = ['#ffffff','#ffe9a8','#c9f0d8','#cfe0ff','#ffd3d6','#e6d4ff','#ffd9b8'];
+
+/* ============ STATE ============ */
+const KEY = 'studyPlannerV1';
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) } catch(e){}
+S = Object.assign({tasks:[], xp:0, routine:{cols:4, rows:4, gap:8, h:90, cells:{}}}, S||{});
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)) }catch(e){} }
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d) };
+let mode = 'day', cursor = new Date(); cursor.setHours(0,0,0,0);
+let toastTimer;
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,3500) }
+
+/* ============ RANK ============ */
+function rankFor(xp){ let r=RANKS[0]; for(const x of RANKS) if(xp>=x.xp) r=x; return r }
+function renderRank(){
+  const r = rankFor(S.xp), i = RANKS.indexOf(r), nx = RANKS[i+1];
+  $('rankName').textContent = r.name;
+  $('xpText').textContent = S.xp+' XP';
+  if(nx){
+    $('nextText').textContent = (nx.xp-S.xp)+' XP to '+nx.name;
+    $('xpBar').style.width = ((S.xp-r.xp)/(nx.xp-r.xp)*100)+'%';
+  } else { $('nextText').textContent = 'Top title reached'; $('xpBar').style.width='100%' }
+}
+
+/* ============ PLANNER ============ */
+function range(){
+  const a = new Date(cursor), b = new Date(cursor);
+  if(mode==='week'){ a.setDate(a.getDate()-a.getDay()); b.setTime(a.getTime()); b.setDate(a.getDate()+6) }
+  if(mode==='month'){ a.setDate(1); b.setTime(a.getTime()); b.setMonth(b.getMonth()+1); b.setDate(0) }
+  return [a,b];
+}
+const fmt = (d,o) => d.toLocaleDateString('en-GB',o);
+function renderPlanner(){
+  const [a,b] = range();
+  $('periodLabel').textContent = mode==='day' ? fmt(a,{weekday:'long',day:'numeric',month:'short',year:'numeric'})
+    : mode==='week' ? fmt(a,{day:'numeric',month:'short'})+' – '+fmt(b,{day:'numeric',month:'short',year:'numeric'})
+    : fmt(a,{month:'long',year:'numeric'});
+  $('submitBtn').textContent = 'Submit this '+(mode==='day'?'day':mode==='week'?'week':'month')+'’s page';
+  const sa=ymd(a), sb=ymd(b);
+  const items = S.tasks.filter(t=>t.date>=sa && t.date<=sb).sort((x,y)=>x.date.localeCompare(y.date));
+  const list = $('list'); list.textContent='';
+  if(!items.length){
+    const e=document.createElement('div'); e.className='empty'; e.textContent='No tasks on this page. Add one above and pick a date.'; list.appendChild(e);
+  }
+  items.forEach(t=>{
+    const row=document.createElement('div'); row.className='task';
+    const info=document.createElement('div'); info.className='info';
+    const title=document.createElement('div'); title.className='t'; title.textContent=t.title;
+    const meta=document.createElement('div'); meta.className='m';
+    const tag=document.createElement('span'); tag.className='tag'; tag.textContent=t.type;
+    meta.append(tag, fmt(parse(t.date),{weekday:'short',day:'numeric',month:'short'}));
+    info.append(title, meta); row.appendChild(info);
+    if(t.submitted){
+      const f=document.createElement('span');
+      f.className='final '+(t.status==='done'?'ok':'bad');
+      f.textContent = t.status==='done' ? 'Done +'+XP_PER_TASK+' XP' : 'Not done';
+      row.appendChild(f);
+    } else {
+      const m=document.createElement('div'); m.className='mark';
+      const y=document.createElement('button'); y.className='y'; y.textContent='✓'; y.title='Done'; y.setAttribute('aria-label','Mark done'); y.setAttribute('aria-pressed', t.status==='done');
+      const n=document.createElement('button'); n.className='n'; n.textContent='✕'; n.title='Not done'; n.setAttribute('aria-label','Mark not done'); n.setAttribute('aria-pressed', t.status==='failed');
+      y.onclick=()=>{ t.status = t.status==='done'?'pending':'done'; save(); renderPlanner() };
+      n.onclick=()=>{ t.status = t.status==='failed'?'pending':'failed'; save(); renderPlanner() };
+      m.append(y,n); row.appendChild(m);
+      const d=document.createElement('button'); d.className='del'; d.textContent='🗑'; d.title='Delete task'; d.setAttribute('aria-label','Delete task');
+      d.onclick=()=>{ if(confirm('Delete “'+t.title+'”?')){ S.tasks=S.tasks.filter(x=>x!==t); save(); renderPlanner() } };
+      row.appendChild(d);
+    }
+    list.appendChild(row);
+  });
+  const open = items.filter(t=>!t.submitted);
+  const pending = open.filter(t=>t.status==='pending').length;
+  const doneN = open.filter(t=>t.status==='done').length;
+  const btn=$('submitBtn');
+  btn.disabled = !open.length || pending>0;
+  $('submitInfo').textContent = !items.length ? '' : !open.length ? 'This page is already submitted.'
+    : pending>0 ? pending+' task'+(pending>1?'s':'')+' still need a ✓ or ✕ before you can submit.'
+    : 'Ready. You will earn '+(doneN*XP_PER_TASK)+' XP.';
+  renderRank(); renderTitles();
+}
+$('addBtn').onclick=()=>{
+  const title=$('tTitle').value.trim(), date=$('tDate').value;
+  if(!title){ toast('Write a task name first.'); $('tTitle').focus(); return }
+  if(!date){ toast('Pick a date for the task.'); $('tDate').focus(); return }
+  S.tasks.push({id:Date.now()+Math.random(), title, type:$('tType').value, date, status:'pending', submitted:false});
+  save(); $('tTitle').value=''; cursor=parse(date); renderPlanner(); toast('Task added.');
+};
+$('tTitle').addEventListener('keydown',e=>{ if(e.key==='Enter') $('addBtn').click() });
+$('submitBtn').onclick=()=>{
+  const [a,b]=range(), sa=ymd(a), sb=ymd(b);
+  const open=S.tasks.filter(t=>t.date>=sa&&t.date<=sb&&!t.submitted);
+  if(!open.length || open.some(t=>t.status==='pending')) return;
+  const before=rankFor(S.xp);
+  const gained=open.filter(t=>t.status==='done').length*XP_PER_TASK;
+  open.forEach(t=>t.submitted=true);
+  S.xp+=gained; save(); renderPlanner();
+  const after=rankFor(S.xp);
+  toast(after!==before ? 'Submitted. +'+gained+' XP. New title: '+after.name+'!' : 'Submitted. +'+gained+' XP.');
+};
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+  mode=b.dataset.mode;
+  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  renderPlanner();
+});
+function shift(dir){
+  if(mode==='day') cursor.setDate(cursor.getDate()+dir);
+  if(mode==='week') cursor.setDate(cursor.getDate()+7*dir);
+  if(mode==='month'){ cursor.setDate(1); cursor.setMonth(cursor.getMonth()+dir) }
+  renderPlanner();
+}
+$('prev').onclick=()=>shift(-1); $('next').onclick=()=>shift(1);
+$('todayBtn').onclick=()=>{ cursor=new Date(); cursor.setHours(0,0,0,0); renderPlanner() };
+$('tDate').value=ymd(new Date());
+
+/* ============ TITLES ============ */
+function renderTitles(){
+  const cur=rankFor(S.xp), box=$('ranksList'); box.textContent='';
+  RANKS.forEach(r=>{
+    const d=document.createElement('div'); if(r===cur) d.className='cur';
+    const b=document.createElement('b'); b.textContent=r.name;
+    const s=document.createElement('span'); s.textContent=r.xp+' XP';
+    d.append(b,s); box.appendChild(d);
+  });
+  const sub=S.tasks.filter(t=>t.submitted);
+  const ok=sub.filter(t=>t.status==='done').length;
+  $('record').textContent = sub.length ? 'You have submitted '+sub.length+' tasks: '+ok+' done and '+(sub.length-ok)+' not done.' : 'No submitted tasks yet. Finish a page to start earning XP.';
+}
+
+/* ============ ROUTINE ============ */
+let selected = null;
+function renderRoutine(){
+  const R=S.routine; $('rCols').value=R.cols; $('rRows').value=R.rows; $('rGap').value=R.gap; $('rH').value=R.h;
+  $('gapVal').textContent=R.gap; $('hVal').textContent=R.h;
+  const g=$('grid'); g.textContent='';
+  g.style.gridTemplateColumns='repeat('+R.cols+',minmax(56px,1fr))';
+  g.style.gap=R.gap+'px';
+  for(let r=0;r<R.rows;r++) for(let c=0;c<R.cols;c++){
+    const id=r+'-'+c, data=R.cells[id]||{text:'',color:'#ffffff'};
+    const el=document.createElement('textarea'); el.className='cell'+(selected===id?' sel':'');
+    el.style.height=R.h+'px'; el.style.background=data.color; el.value=data.text;
+    el.setAttribute('aria-label','Box row '+(r+1)+' column '+(c+1));
+    el.onfocus=()=>{ selected=id; g.querySelectorAll('.cell').forEach(x=>x.classList.remove('sel')); el.classList.add('sel') };
+    el.oninput=()=>{ R.cells[id]=Object.assign(R.cells[id]||{color:'#ffffff'},{text:el.value}); save() };
+    g.appendChild(el);
+  }
+}
+function setRoutine(k,v,min,max){ v=Math.max(min,Math.min(max,parseInt(v)||min)); S.routine[k]=v; save(); renderRoutine() }
+$('rCols').onchange=e=>setRoutine('cols',e.target.value,1,10);
+$('rRows').onchange=e=>setRoutine('rows',e.target.value,1,12);
+$('rGap').oninput=e=>setRoutine('gap',e.target.value,0,30);
+$('rH').oninput=e=>setRoutine('h',e.target.value,50,160);
+SWATCHES.forEach(c=>{
+  const b=document.createElement('button'); b.className='sw'; b.style.background=c; b.setAttribute('aria-label','Colour '+c);
+  b.onmousedown=e=>e.preventDefault();
+  b.onclick=()=>{
+    if(!selected){ toast('Click a box first.'); return }
+    S.routine.cells[selected]=Object.assign(S.routine.cells[selected]||{text:''},{color:c}); save();
+    const i=selected; renderRoutine(); selected=i;
+    const idx=S.routine.cols*parseInt(i)+0; // keep highlight
+    const [r,cc]=i.split('-').map(Number); $('grid').children[r*S.routine.cols+cc]?.classList.add('sel');
+  };
+  $('swatches').appendChild(b);
+});
+$('clearCell').onclick=()=>{ if(!selected){ toast('Click a box first.'); return } delete S.routine.cells[selected]; save(); const i=selected; renderRoutine(); selected=i };
+$('printBtn').onclick=()=>window.print();
+$('resetRoutine').onclick=()=>{ if(confirm('Clear the whole routine?')){ S.routine={cols:4,rows:4,gap:8,h:90,cells:{}}; selected=null; save(); renderRoutine() } };
+
+/* ============ TABS ============ */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected', x===b));
+  ['planner','routine','titles'].forEach(t=>$('tab-'+t).hidden = t!==b.dataset.tab);
+});
+
+/* ============ VISIT COUNTER ============ */
+/* Counts one visit each time someone opens the site in a new browser session.
+   To see your numbers, open your site with #owner at the end, e.g. https://yourname.github.io/study-planner/#owner */
+async function counter(path){
+  const r = await fetch('https://api.counterapi.dev/v1/'+COUNTER_NS+'/'+path);
+  if(!r.ok) return 0;
+  const j = await r.json(); return j.count||0;
+}
+(async function visits(){
+  const isOwner = location.hash==='#owner';
+  const today = ymd(new Date());
+  try{
+    if(!isOwner && !sessionStorage.getItem('counted')){
+      sessionStorage.setItem('counted','1');
+      counter('total/up'); counter('day-'+today+'/up');
+    }
+    if(isOwner){
+      $('ownerBox').hidden=false;
+      const rows=[]; const total=await counter('total');
+      for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()-i); const k=ymd(d); rows.push([k, await counter('day-'+k)]) }
+      const box=$('ownerData'); box.textContent='';
+      const p=document.createElement('p'); p.style.margin='0'; p.textContent='All-time visits: '+total; box.appendChild(p);
+      const t=document.createElement('table');
+      rows.forEach(([k,n])=>{ const tr=t.insertRow(); tr.insertCell().textContent=k===today?'Today':k; tr.insertCell().textContent=n });
+      box.appendChild(t);
+    }
+  }catch(e){ if(isOwner) $('ownerData').textContent='Could not reach the counter service. Check your internet and try again.' }
+})();
+
+renderPlanner(); renderRoutine();
+</script>
+</body>
+</html>
