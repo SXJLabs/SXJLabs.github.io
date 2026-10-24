@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.sxjlabs.studyplanner",
+        "sha256_cert_fingerprints": ["0E:AE:41:56:DD:20:5E:EF:24:B5:DB:94:C1:E1:0A:09:51:6C:48:F8:27:FA:CE:DA:08:05:2C:66:16:E6:4A:85"]
+      }
+    }]
